@@ -60,27 +60,25 @@ struct wpert_cart_t {
 
 //for our spherical coordinates we need to use a different perturbation function
 struct wpert_sph_t {
-  float rpert1, rpert2;
+  float twist_th1, twist_th2;
   float tp_start, tp_end, nT, dw0;
 
-  HD_INLINE wpert_sph_t(float rp1, float rp2, float tp_s, float tp_e, float nT_,
+  HD_INLINE wpert_sph_t(float th1, float th2, float tp_s, float tp_e, float nT_,
                         float dw0_)
-      : rpert1(rp1),
-        rpert2(rp2),
+      : twist_th1(th1),
+        twist_th2(th2),
         tp_start(tp_s),
         tp_end(tp_e),
         nT(nT_),
         dw0(dw0_) {}
 
   HD_INLINE Scalar operator()(Scalar t, Scalar r, Scalar th) {
-    Scalar th1 = math::acos(math::sqrt(1.0f - 1.0f / rpert1));
-    Scalar th2 = math::acos(math::sqrt(1.0f - 1.0f / rpert2));
-    if (th1 > th2)
-      swap_values(th1, th2);
+    if (twist_th1 > twist_th2)
+      swap_values(twist_th1, twist_th2);
 
-    Scalar mu = (th1 + th2) / 2.0;
-    Scalar s = (mu - th1) / 3.0;
-    if (t >= tp_start && t <= tp_end && th >= th1 && th <= th2) {
+    Scalar mu = (twist_th1 + twist_th2) / 2.0;
+    Scalar s = (mu - twist_th1) / 3.0;
+    if (t >= tp_start && t <= tp_end && th >= twist_th1 && th <= twist_th2) {
       Scalar omega =
           dw0 * math::exp(-0.5 * square((th - mu) / s)) *
           math::sin((t - tp_start) * 2.0 * M_PI * nT / (tp_end - tp_start));
@@ -141,10 +139,8 @@ inject_particles(particle_data_t& ptc, curand_states_t& rand_states,
       ptc.get_dev_ptrs(), surface_ne.dev_ptr(), surface_np.dev_ptr());
   CudaSafeCall(cudaDeviceSynchronize());
 
-  Scalar th1 = math::acos(math::sqrt(1.0f - 1.0f / rpert1));
-  Scalar th2 = math::acos(math::sqrt(1.0f - 1.0f / rpert2));
-  if (th1 > th2)
-    swap_values(th1, th2);
+  if (twist_th1 > twist_th2)
+    swap_values(twist_th1, twist_th2);
 
   // Then inject particles
   kernel_launch(
@@ -166,7 +162,7 @@ inject_particles(particle_data_t& ptc, curand_states_t& rand_states,
 
           //if theta isn't within the range of th1 and th2, skip
           Scalar theta = grid.template coord<1>(n1, false);
-          if (theta > th2 + 0.1f || theta < th1 - 0.1f)
+          if (theta > twist_th2 + 0.1f || theta < twist_th1 - 0.1f)
             continue;
 
           //if the surface density is too low, skip. for our case I don't think we need this.
@@ -263,8 +259,8 @@ boundary_condition<Conf>::init() {
   m_env.get_data("rand_states", &rand_states);
   m_env.get_data("particles", &ptc);
 
-  m_env.params().get_value("rpert1", m_rpert1);
-  m_env.params().get_value("rpert2", m_rpert2);
+  m_env.params().get_value("th_twist1", m_twist_th1);
+  m_env.params().get_value("th_twist2", m_twist_th2);
   m_env.params().get_value("tp_start", m_tp_start);
   m_env.params().get_value("tp_end", m_tp_end);
   m_env.params().get_value("nT", m_nT);
@@ -279,9 +275,9 @@ boundary_condition<Conf>::init() {
   m_surface_np.resize(m_grid.dims[1]);
 
   //added from the alfven_wave case
-  auto rho0 = sim_env().params().get_as<double>("rho0", 100.0);
-  int mult = sim_env().params().get_as<int64_t>("multiplicity", 10);
-  value_t q_e = sim_env().params().get_as<double>("q_e", 1.0);
+  auto rho0 = m_env().params().get_as<double>("rho0", 100.0);
+  int mult = m_env().params().get_as<int64_t>("multiplicity", 10);
+  value_t q_e = m_env().params().get_as<double>("q_e", 1.0);
   m_weight = rho0 / mult / q_e * 10.0f;
 
   m_surface_n.resize(m_grid.dims[1]);
@@ -296,11 +292,9 @@ boundary_condition<Conf>::update(double dt, uint32_t step) {
   //NEED TO MAKE SURE THAT BASICALLY WE ONLY TWIST WITHIN A PARTICULAR THETA RANGE
 
   value_t time = m_env.get_time();
-  wpert_sph_t wpert(m_rpert1, m_rpert2, m_tp_start, m_tp_end, m_nT, m_dw0);
+  wpert_sph_t wpert(m_twist_th1, m_twist_th2, m_tp_start, m_tp_end, m_nT, m_dw0);
   // wpert_cart_t wpert(m_tp_start, m_tp_end, m_nT, m_dw0, m_qe);
 
-  value_t twist_th1 = math::asin(math::sqrt(1.0 / m_rpert1));
-  value_t twist_th2 = math::asin(math::sqrt(1.0 / m_rpert2));
 
   // Apply twist on the stellar surface
    kernel_launch(
@@ -308,7 +302,7 @@ boundary_condition<Conf>::update(double dt, uint32_t step) {
          auto& grid = dev_grid<Conf::dim, typename Conf::value_t>();
          auto ext = grid.extent();
 
-         value_t th_m = (twist_th1 + twist_th2) * 0.5f;
+         value_t th_m = (m_twist_th1 + m_twist_th2) * 0.5f;
 
          for (auto n1 : grid_stride_range(0, grid.dims[1])) {
             value_t theta =
@@ -325,7 +319,7 @@ boundary_condition<Conf>::update(double dt, uint32_t step) {
              value_t omega = wpert(time, r, theta_s);
              e[0][idx] = omega * sin(theta_s) * r * b0[1][idx]*
                             square(math::cos(M_PI * (theta_s - th_m) /
-                                             (twist_th2 - twist_th1)));;
+                                             (m_twist_th2- m_twist_th1)));;
              b[1][idx] = 0.0;
              b[2][idx] = 0.0;
            }
@@ -339,7 +333,7 @@ boundary_condition<Conf>::update(double dt, uint32_t step) {
              b[0][idx] = 0.0;
              e[1][idx] = -omega *sin(theta) * r_s * b0[0][idx]*
                             square(math::cos(M_PI * (theta_s - th_m) /
-                                             (twist_th2 - twist_th1)));;
+                                             (m_twist_th2 - m_twist_th1)));;
              e[2][idx] = 0.0;
            }
          }

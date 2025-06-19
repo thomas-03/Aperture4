@@ -26,7 +26,7 @@
 #include "utils/nonown_ptr.hpp"
 #include "utils/util_functions.h"
 #include <memory>
-
+//I NEED TO ADD THE CORRECTED THETA RANGE PARAMETERS TO THE NO CUDA VERSION!
 namespace Aperture {
 
 template <typename Conf, template <class> class ExecPolicy>

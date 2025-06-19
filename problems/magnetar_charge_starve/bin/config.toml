@@ -20,8 +20,7 @@ use_pml = false
 
 use_implicit = false
 
-#output_dir = "/storage1/fs1/yajiey/Active/Thomas/"
-output_dir = "/home/t.a.thomas"
+output_dir = "/storage1/fs1/yajiey/Active/Thomas/"
 
 ### Simulation life time
 max_steps = 100000

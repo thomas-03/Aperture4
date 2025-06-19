@@ -39,6 +39,8 @@ class boundary_condition : public system_t {
   double m_freq = 5.0;
   double m_Bp = 1.0;
   int m_num_lambda = 4;
+  double m_twist_th1 = 0.0; //lower theta bound for twisting
+  double m_twist_th2 = M_PI; //upper theta bound for twisting
 
   nonown_ptr<vector_field<Conf>> E, B, E0, B0;
 

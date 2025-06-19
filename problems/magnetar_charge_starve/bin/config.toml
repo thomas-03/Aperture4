@@ -95,5 +95,5 @@ num_lambda = 4
 # prof_thick = 1.0
 
 ### Perturbation parameters
-th_twist1 = 0.7854
-th_twist2 = 1.0472
+twist_th1 = 0.7854
+twist_th2 = 1.0472

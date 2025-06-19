@@ -73,6 +73,8 @@ class boundary_condition : public system_t {
 
       value_t time = sim_env().get_time();
       value_t Bp = m_Bp;
+      value_t twist_th1 = m_twist_th1;
+      value_t twist_th2 = m_twist_th2;
       value_t omega;
       value_t phase = 2.0 * M_PI * m_freq * time;
       //this controls whether or not we are actively twisting the field and driving the wave
@@ -82,8 +84,6 @@ class boundary_condition : public system_t {
       else
         omega = 0.0;
       
-      value_t twist_th1 = m_twist_th1;
-      value_t twist_th2 = m_twist_th2;
       //for now the fast wave gets absorbed at the surface when you get to the bottom so we probably want to run it just with that once to make sure stuff works
       //then will want to change the boundary condition so it actually reflects by making it conducting 
       ExecPolicy<Conf>::launch(

@@ -9,7 +9,7 @@ add_subdirectory(debug)
 add_subdirectory(two_stream)
 add_subdirectory(reconnection)
 add_subdirectory(gr_2d_kerr_schild)
-add_subdirectory(magnetar)
+#add_subdirectory(magnetar)
 add_subdirectory(parker)
 
 add_subdirectory(vlasov_test)

@@ -32,8 +32,42 @@ set(Aperture_src
   "systems/sync_curv_emission.cpp"
   "systems/vlasov_solver.cpp"
   )
-set_source_files_properties(${Aperture_src} PROPERTIES LANGUAGE CXX)
-add_library(Aperture STATIC ${Aperture_src})
+set_source_files_properties("core/buffer_impl.hip.cpp"
+    "core/constant_mem.hip.cpp"
+    "core/detail/multi_array_helpers.hip.cpp"
+    "core/particles_functions.hip.cpp"
+    "data/rng_states.hip.cpp"
+    "systems/data_exporter.hip.cpp"
+    "systems/domain_comm.hip.cpp"
+    "systems/field_solver_cartesian.hip.cpp"
+    "systems/field_solver_sph.hip.cpp"
+    "systems/field_solver_gr_ks.hip.cpp"
+    # "systems/field_solver_polar.hip.cpp"
+    "systems/compute_moments.hip.cpp"
+    "systems/compute_moments_gr_ks.hip.cpp"
+    "systems/gather_momentum_space.hip.cpp"
+    "systems/gather_tracked_ptc.hip.cpp"
+    "systems/ptc_updater.hip.cpp"
+    "systems/radiative_transfer.hip.cpp"
+    "systems/vlasov_solver.hip.cpp" PROPERTIES LANGUAGE CXX)
+add_library(Aperture STATIC "core/buffer_impl.hip.cpp"
+    "core/constant_mem.hip.cpp"
+    "core/detail/multi_array_helpers.hip.cpp"
+    "core/particles_functions.hip.cpp"
+    "data/rng_states.hip.cpp"
+    "systems/data_exporter.hip.cpp"
+    "systems/domain_comm.hip.cpp"
+    "systems/field_solver_cartesian.hip.cpp"
+    "systems/field_solver_sph.hip.cpp"
+    "systems/field_solver_gr_ks.hip.cpp"
+    # "systems/field_solver_polar.hip.cpp"
+    "systems/compute_moments.hip.cpp"
+    "systems/compute_moments_gr_ks.hip.cpp"
+    "systems/gather_momentum_space.hip.cpp"
+    "systems/gather_tracked_ptc.hip.cpp"
+    "systems/ptc_updater.hip.cpp"
+    "systems/radiative_transfer.hip.cpp"
+    "systems/vlasov_solver.hip.cpp")
 target_link_libraries(Aperture fmt::fmt ${MPI_LIBRARIES}
   ${HDF5_LIBRARIES} ${Boost_LIBRARIES})
 

@@ -57,7 +57,12 @@ elseif(use_hip)
   # target_sources(tests_dev PUBLIC
 endif()
   add_executable(tests_dev
-    ${test_dev_src})
+    "test_multi_array.cu"
+    "test_vec.cu"
+    "test_params.cu"
+    "test_grid.cu"
+    "test_math.cu"
+    "test_rng.cu")
   # target_link_libraries(tests_dev Aperture_dev Catch2::Catch2WithMain)
   target_link_libraries(tests_dev PUBLIC
     Aperture

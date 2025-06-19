@@ -51,7 +51,7 @@ lower = [0.0, 0.0]
 
 # Size of the box in each dimension
 # exp(3.0) is about 20
-size = [2.0, 3.141593]
+size = [1.75, 3.141593]
 
 # Whether boundaries are periodic
 periodic_boundary = [false, false]

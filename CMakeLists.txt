@@ -122,6 +122,8 @@ if(use_cuda)
     )
     include_directories(${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES}
                         ${CUDA_INCLUDE_DIRS})
+
+    find_package(rocthrust)
     #set(CUDA_EXTRA_FLAGS "-DNO_WARN_X86_INTRINSICS")
     set(CMAKE_CUDA_FLAGS
         "--expt-extended-lambda --expt-relaxed-constexpr\

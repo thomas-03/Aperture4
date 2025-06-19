@@ -59,12 +59,47 @@ if (use_cuda OR use_hip)
     "systems/vlasov_solver.hip.cpp"
     )
   if (use_cuda AND CMAKE_CUDA_COMPILER)
-    set_source_files_properties(${Aperture_dev_src} PROPERTIES LANGUAGE CUDA)
+    set_source_files_properties("core/buffer_impl.hip.cpp"
+    "core/constant_mem.hip.cpp"
+    "core/detail/multi_array_helpers.hip.cpp"
+    "core/particles_functions.hip.cpp"
+    "data/rng_states.hip.cpp"
+    "systems/data_exporter.hip.cpp"
+    "systems/domain_comm.hip.cpp"
+    "systems/field_solver_cartesian.hip.cpp"
+    "systems/field_solver_sph.hip.cpp"
+    "systems/field_solver_gr_ks.hip.cpp"
+    # "systems/field_solver_polar.hip.cpp"
+    "systems/compute_moments.hip.cpp"
+    "systems/compute_moments_gr_ks.hip.cpp"
+    "systems/gather_momentum_space.hip.cpp"
+    "systems/gather_tracked_ptc.hip.cpp"
+    "systems/ptc_updater.hip.cpp"
+    "systems/radiative_transfer.hip.cpp"
+    "systems/vlasov_solver.hip.cpp"
+     PROPERTIES LANGUAGE CUDA)
   elseif(use_hip)
     set_source_files_properties(${Aperture_dev_src} PROPERTIES LANGUAGE HIP)
   endif()
 
-  add_library(Aperture_dev ${Aperture_dev_src})
+  add_library(Aperture_dev "core/buffer_impl.hip.cpp"
+    "core/constant_mem.hip.cpp"
+    "core/detail/multi_array_helpers.hip.cpp"
+    "core/particles_functions.hip.cpp"
+    "data/rng_states.hip.cpp"
+    "systems/data_exporter.hip.cpp"
+    "systems/domain_comm.hip.cpp"
+    "systems/field_solver_cartesian.hip.cpp"
+    "systems/field_solver_sph.hip.cpp"
+    "systems/field_solver_gr_ks.hip.cpp"
+    # "systems/field_solver_polar.hip.cpp"
+    "systems/compute_moments.hip.cpp"
+    "systems/compute_moments_gr_ks.hip.cpp"
+    "systems/gather_momentum_space.hip.cpp"
+    "systems/gather_tracked_ptc.hip.cpp"
+    "systems/ptc_updater.hip.cpp"
+    "systems/radiative_transfer.hip.cpp"
+    "systems/vlasov_solver.hip.cpp")
   target_link_libraries(Aperture_dev PUBLIC Aperture)
   if (use_cuda AND CMAKE_CUDA_COMPILER)
     target_link_libraries(Aperture_dev PUBLIC ${CUDART_LIBRARY} ${CUSPARSE_LIBRARY})

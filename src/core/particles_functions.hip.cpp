@@ -27,12 +27,6 @@
 #include "utils/timer.h"
 #include "visit_struct/visit_struct.hpp"
 
-#include <thrust/binary_search.h>
-#include <thrust/device_ptr.h>
-#include <thrust/gather.h>
-#include <thrust/iterator/counting_iterator.h>
-#include <thrust/replace.h>
-#include <thrust/sort.h>
 
 namespace Aperture {
 

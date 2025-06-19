@@ -127,6 +127,10 @@ class boundary_condition : public system_t {
 
               // For quantities that are continuous across the surface
               for (int n0 = 0; n0 < grid.guard[0] + 1; n0++) {
+
+                value_t r =
+                    grid_sph_t<Conf>::radius(grid.template coord<0>(n0, false));
+              value_t r_s = grid_sph_t<Conf>::radius(grid.coord(0, n0, true));
                 // n0 = grid.guard[0] + 1;
                 auto idx = idx_t(index_t<2>(n0, n1), ext);
                 //B_r=0,E_theta=0,E_phi=0

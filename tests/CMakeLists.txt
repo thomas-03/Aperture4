@@ -54,13 +54,15 @@ elseif(use_hip)
     )
   # target_sources(tests_dev PUBLIC
 endif()
-  add_executable(tests_dev
-    ${test_dev_src})
-  # target_link_libraries(tests_dev Aperture_dev Catch2::Catch2WithMain)
+  if (DEFINED test_dev_src)
+  add_executable(tests_dev ${test_dev_src})
   target_link_libraries(tests_dev PUBLIC
     Aperture
     $<TARGET_NAME_IF_EXISTS:Aperture_dev>
     Catch2::Catch2WithMain)
+else()
+  message(WARNING "tests_dev not built: test_dev_src not defined. Check use_cuda/use_hip settings.")
+endif()
 endif()
 
 add_custom_target(

@@ -37,7 +37,6 @@ if (use_cuda AND CMAKE_CUDA_COMPILER)
     "test_math.cu"
     "test_cusparse.cu"
     "test_rng.cu"
-    # "compare_new_pusher_sph.cpp"
     )
   set_source_files_properties(${test_dev_src} PROPERTIES LANGUAGE CUDA)
 elseif(use_hip)
@@ -48,7 +47,6 @@ elseif(use_hip)
     "test_grid.cu"
     "test_math.cu"
     "test_rng.cu"
-    # "compare_new_pusher_sph.cpp"
     )
   set_source_files_properties(${test_dev_src} PROPERTIES
     LANGUAGE HIP

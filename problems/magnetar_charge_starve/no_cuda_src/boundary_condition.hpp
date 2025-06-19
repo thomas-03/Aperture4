@@ -59,8 +59,8 @@ class boundary_condition : public system_t {
 
     sim_env().params().get_value("w0", m_w0);
     sim_env().params().get_value("wave_freq", m_freq);
-    sim_env().params().get_value("twist_rmax_1", m_twist_rmax_1);
-    sim_env().params().get_value("twist_rmax_2", m_twist_rmax_2);
+    sim_env().params().get_value("twist_th1", m_twist_th1);
+    sim_env().params().get_value("twist_th2", m_twist_th2);
     //Bp is the initial dipole field
     sim_env().params().get_value("Bp", m_Bp);
     sim_env().params().get_value("num_lambda", m_num_lambda);
@@ -82,13 +82,11 @@ class boundary_condition : public system_t {
       else
         omega = 0.0;
       
-      value_t twist_th1 = math::asin(math::sqrt(1.0 / m_twist_rmax_1));
-      value_t twist_th2 = math::asin(math::sqrt(1.0 / m_twist_rmax_2));
 
       //for now the fast wave gets absorbed at the surface when you get to the bottom so we probably want to run it just with that once to make sure stuff works
       //then will want to change the boundary condition so it actually reflects by making it conducting 
       ExecPolicy<Conf>::launch(
-          [omega, Bp, twist_th1, twist_th2] LAMBDA(auto e, auto b, auto e0, auto b0) {
+          [omega, Bp, m_twist_th1, m_twist_th2] LAMBDA(auto e, auto b, auto e0, auto b0) {
             auto& grid = ExecPolicy<Conf>::grid();
             value_t th_m = (twist_th1 + twist_th2) * 0.5f;
             auto ext = grid.extent();
@@ -104,7 +102,7 @@ class boundary_condition : public system_t {
                     grid_sph_t<Conf>::radius(grid.template coord<0>(n0, false));
               value_t r_s = grid_sph_t<Conf>::radius(grid.coord(0, n0, true));
               //it's just saying if  theta_s is in the range of twist_th1 and twist_th2 go ahead and twist (only twist on the upper hemisphere)
-            if (theta_s >= twist_th1 && theta < twist_th2) {
+            if (theta_s >= m_twist_th1 && theta < m_twist_th2) {
               value_t s = (theta > 0.5f * M_PI ? -1.0f : 1.0f); // enforcing sign of the twist to be hemisphere dependent
               if (theta > 0.5f * M_PI) {
                 th_m = M_PI - th_m;
@@ -116,7 +114,7 @@ class boundary_condition : public system_t {
                 //E_r=0,B_theta=0,B_phi=0
                 e[0][idx] = omega * sin(theta_s) * r * b0[1][idx]*
                             square(math::cos(M_PI * (theta_s - th_m) /
-                                             (twist_th2 - twist_th1)));
+                                             (m_twist_th2 - m_twist_th1)));
                 b[1][idx] = 0.0;
                 //we can try imposing B_phi and see what happens or we can impose B_phi and E_theta
                 //because its highly magnetized for fast wave we just do E_phi as opposed to E_phi and the other stuff (B_theta and some init U distr.)
@@ -132,7 +130,7 @@ class boundary_condition : public system_t {
                 b[0][idx] = 0.0;
                 e[1][idx] = -omega *sin(theta_s) * r_s * b0[0][idx]*
                             square(math::cos(M_PI * (theta - th_m) /
-                                             (twist_th2 - twist_th1)));
+                                             (m_twist_th2 - m_twist_th1)));
                 e[2][idx] = 0.0;
                 //you have some e_phi for the fast wave case
                 //in our problem we would want to have some e_theta and e_r perturbation

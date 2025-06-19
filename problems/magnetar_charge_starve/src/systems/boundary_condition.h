@@ -39,6 +39,8 @@ class boundary_condition : public system_t {
   float m_damping_coef = 1.0f;
   float m_qe = 1.0f;
   float m_muB = 0.1f;
+  float m_twist_th1 = 0.0f; // lower theta bound for twisting
+  float m_twist_th2 = M_PI; // upper theta bound for twisting
 
   vector_field<Conf> *E, *B, *E0, *B0;
   particle_data_t *ptc;

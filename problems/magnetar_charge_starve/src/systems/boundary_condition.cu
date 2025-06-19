@@ -144,7 +144,7 @@ inject_particles(particle_data_t& ptc, curand_states_t& rand_states,
 
   // Then inject particles
   kernel_launch(
-      [ptc_num, weight, th1, th2] __device__(auto ptc, auto surface_ne, auto surface_np,
+      [ptc_num, weight, twist_th1, twist_th2] __device__(auto ptc, auto surface_ne, auto surface_np,
                                    auto num_inj, auto states) {
         auto& grid = dev_grid<Conf::dim, typename Conf::value_t>();
         auto ext = grid.extent();

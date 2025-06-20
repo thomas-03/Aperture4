@@ -163,7 +163,7 @@ if(use_cuda)
     find_library(CUSPARSE_LIBRARY cusparse
                  PATHS ${CMAKE_CUDA_IMPLICIT_LINK_DIRECTORIES})
   else()
-    message(FATAL_ERROR "CUDA compiler not found. Please check your CUDA installation.")
+    message("CUDA compiler not found. Please check your CUDA installation.")
   endif()
 endif()
 

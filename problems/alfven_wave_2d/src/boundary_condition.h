@@ -15,8 +15,78 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef __BOUNDARY_CONDITION_H_
+#define __BOUNDARY_CONDITION_H_
+
+#include "data/fields.h"
+#include "data/particle_data.h"
+// #include "data/curand_states.h"
+#include "framework/environment.h"
+#include "framework/system.h"
+#include "systems/grid.h"
+#include <memory>
+
+namespace Aperture {
+
+template <typename Conf>
+class boundary_condition : public system_t {
+ protected:
+  const grid_t<Conf>& m_grid;
+  typename Conf::value_t m_tp_start, m_tp_end, m_nT, m_dw0;
+  int m_damping_length = 64;
+  float m_pmllen = 1.0f;
+  float m_sigpml = 1.0f;
+  float m_damping_coef = 1.0f;
+  float m_qe = 1.0f;
+  float m_muB = 0.1f;
+  float m_twist_th1 = 0.0f; // lower theta bound for twisting
+  float m_twist_th2 = M_PI; // upper theta bound for twisting
+
+  vector_field<Conf> *E, *B, *E0, *B0;
+  particle_data_t *ptc;
+  curand_states_t *rand_states;
+
+  buffer<float> m_surface_np, m_surface_ne;
+  std::unique_ptr<typename Conf::multi_array_t> m_prev_E1, m_prev_E2, m_prev_E3;
+  std::unique_ptr<typename Conf::multi_array_t> m_prev_B1, m_prev_B2, m_prev_B3;
+  // vec_t<typename Conf::ndptr_t, 3> m_prev_E, m_prev_B;
+  buffer<typename Conf::ndptr_t> m_prev_E, m_prev_B;
+
+ public:
+  static std::string name() { return "boundary_condition"; }
+
+  boundary_condition(sim_environment& env, const grid_t<Conf>& grid);
+
+  void init() override;
+  void update(double dt, uint32_t step) override;
+};
+
+}
+
+#endif // __BOUNDARY_CONDITION_H_
+
+
+
+
+
+/*
+ * Copyright (c) 2020 Alex Chen.
+ * This file is part of Aperture (https://github.com/fizban007/Aperture4.git).
+ *
+ * Aperture is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3.
+ *
+ * Aperture is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #include "boundary_condition.h"
-#include "data/rng_states.h"
 #include "core/math.hpp"
 #include "framework/config.h"
 #include "systems/grid.h"
@@ -24,6 +94,40 @@
 #include "utils/util_functions.h"
 
 namespace Aperture {
+/*
+struct wpert_cart_t {
+  float tp_start, tp_end, nT, dw0, y_start, y_end, q_e;
+
+  //deleted the y_start and y_end parameters
+  HD_INLINE wpert_cart_t(float tp_s, float tp_e, float nT_, float dw0_, float qe)
+      : tp_start(tp_s), tp_end(tp_e), nT(nT_), dw0(dw0_), q_e(qe) {}
+
+  HD_INLINE Scalar operator()(Scalar t, Scalar x, Scalar y) {
+    //took out the condition checking if y is in the right region and replaced it with a condition checking the phase at the stellar surface
+    //I kept the t_start and t_end parameters to allow for a time window if we want to use it
+    value_t phase = 2.0 * M_PI * m_freq * time;
+    if (t >= tp_start && t <= tp_end && phase< 2.0 * M_PI * m_num_lambda) {
+        //Scalar omega = dw0*math::sin(phase);
+        Scalar omega =
+          dw0 *
+          math::sin((t - tp_start) * 2.0f * M_PI * nT / (tp_end - tp_start)) *
+          math::sin(M_PI * (y - y_start) / (y_end - y_start));
+          // math::sin((t - tp_start) * 2.0f * M_PI * nT / (tp_end - tp_start));
+      return omega;
+    } else {
+      return 0.0;
+    }
+  }
+
+  HD_INLINE Scalar j_x(Scalar t, Scalar x, Scalar y, Scalar theta) {
+    return 0.0;
+  }
+
+  HD_INLINE Scalar j_y(Scalar t, Scalar x, Scalar y, Scalar theta) {
+    return 0.0;
+  }
+};
+*/
 
 //for our spherical coordinates we need to use a different perturbation function
 struct wpert_sph_t {
@@ -67,7 +171,7 @@ pml_sigma(Scalar x, Scalar xh, Scalar pmlscale, Scalar sig0) {
 
 template <typename Conf>
 void
-inject_particles(particle_data_t& ptc, rand_state& rand_states,
+inject_particles(particle_data_t& ptc, curand_states_t& rand_states,
                  buffer<float>& surface_ne, buffer<float>& surface_np,
                  int num_per_cell, typename Conf::value_t weight,
                  const grid_t<Conf>& grid, const wpert_sph_t& wpert,
@@ -292,7 +396,6 @@ boundary_condition<Conf>::update(double dt, uint32_t step) {
            }
 
            // For quantities that are continuous across the surface
-           //before the theta in theta-theta_m was theta_s
            for (int n0 = 0; n0 < grid.guard[0] + 1; n0++) {
              auto idx = idx_t(index_t<2>(n0, n1), ext);
              value_t r_s =
@@ -300,7 +403,7 @@ boundary_condition<Conf>::update(double dt, uint32_t step) {
              value_t omega = wpert(time, r_s, theta);
              b[0][idx] = 0.0;
              e[1][idx] = -omega *sin(theta) * r_s * b0[0][idx]*
-                            square(math::cos(M_PI * (theta - th_m) /
+                            square(math::cos(M_PI * (theta_s - th_m) /
                                              (m_twist_th2 - m_twist_th1)));;
              e[2][idx] = 0.0;
            }

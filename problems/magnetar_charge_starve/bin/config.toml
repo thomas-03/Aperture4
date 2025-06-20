@@ -48,6 +48,8 @@ guard = [3, 3]
 
 # Lower limit of the coordinate
 lower = [0.0, 0.0] 
+#the flux is the first moment of the distr function (so it's the average velocity times the number density)
+#the stress is the second moment of the distr function which is the stress energy tensor and is roughly the same as the MHD stress energy tensor
 
 # Size of the box in each dimension
 # exp(3.0) is about 20
@@ -76,6 +78,7 @@ kT = 1.0e-3
 ppc = 10
 # rho0 = 0.0
 rho0 = 1.0e5
+#we need rho0 to be big enough because skin depth is of order 1/sqrt(rho0) and skin depth must be resolved because if it isn't
 
 ph_num_bins = 128
 sync_spec_lower = 1.0e-8

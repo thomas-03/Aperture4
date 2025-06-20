@@ -14,9 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+//
 
 #include "boundary_condition.h"
-#include "data/rng_states.h"
 #include "core/math.hpp"
 #include "framework/config.h"
 #include "systems/grid.h"
@@ -67,7 +67,7 @@ pml_sigma(Scalar x, Scalar xh, Scalar pmlscale, Scalar sig0) {
 
 template <typename Conf>
 void
-inject_particles(particle_data_t& ptc, rand_state& rand_states,
+inject_particles(particle_data_t& ptc, curand_states_t& rand_states,
                  buffer<float>& surface_ne, buffer<float>& surface_np,
                  int num_per_cell, typename Conf::value_t weight,
                  const grid_t<Conf>& grid, const wpert_sph_t& wpert,

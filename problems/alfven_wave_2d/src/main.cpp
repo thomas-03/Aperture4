@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-//TAKEN FROM THE FAST WAVE 2D PROBLEM
 
 #include "core/math.hpp"
 #include "framework/config.h"
@@ -25,7 +24,7 @@
 #include "systems/gather_tracked_ptc.h"
 #include "systems/grid_sph.hpp"
 #include "systems/policies/coord_policy_spherical_bounce.hpp"
-#include "systems/policies/coord_policy_spherical_sync_cooling.hpp"
+//#include "systems/policies/coord_policy_spherical.hpp"
 #include "systems/policies/exec_policy_dynamic.hpp"
 #include "systems/ptc_injector_new.h"
 #include "systems/ptc_updater_impl.hpp"
@@ -45,15 +44,15 @@ main(int argc, char *argv[]) {
   grid_sph_t<Conf> grid(comm);
   auto pusher =
       env.register_system<ptc_updater<Conf, exec_policy_dynamic,
-                                      // coord_policy_spherical_sync_cooling>>(
-          coord_policy_spherical_bounce>>(
+                                      coord_policy_spherical>>(
+          // coord_policy_spherical>>(
           grid, &comm);
   auto tracker =
       env.register_system<gather_tracked_ptc<Conf, exec_policy_dynamic>>(grid);
   auto moments =
       env.register_system<compute_moments<Conf, exec_policy_dynamic>>(grid);
   auto solver = env.register_system<
-      field_solver<Conf, exec_policy_dynamic, coord_policy_spherical_bounce>>(grid,
+      field_solver<Conf, exec_policy_dynamic, coord_policy_spherical>>(grid,
                                                                        &comm);
   auto bc = env.register_system<boundary_condition<Conf, exec_policy_dynamic>>(
       grid, &comm);
@@ -62,21 +61,11 @@ main(int argc, char *argv[]) {
 
   env.init();
 
-  vector_field<Conf> *B0, *Bdelta, *Edelta, *Btotal, *Etotal;
-  env.get_data("B0", &B0);
-  env.get_data("Bdelta", &Bdelta);
-  env.get_data("Edelta", &Edelta);
-  env.get_data("B", &Btotal);
-  env.get_data("E", &Etotal);
+  vector_field<Conf> *B0;
 
-  //get the full resolution fields for these as opposed to the downsampled versions
-  Etotal->set_fullres_output(1, true);
-  Etotal->set_fullres_output(2, true);
-  Btotal->set_fullres_output(1, true);
-  Btotal->set_fullres_output(2, true);
+  env.get_data("B0", &B0);
 
   // Read parameters
-  //Bp is likely field strength and then B0 is actually getting the B field value at each r, theta, phi 
   float Bp = 1.0e4;
   float qe = 1.0;
   float kT = 1.0e-3;
@@ -89,7 +78,7 @@ main(int argc, char *argv[]) {
   env.params().get_value("rho0", rho0);
 
   // Set dipole initial magnetic field
-  B0->set_values(0, [Bp](Scalar x, Scalar theta, Scalar phi) {
+  B0->set_values(0, [Bp](Scalar x, Scalar theta, Scalar phi) { // sets the radial component of B_bg
     Scalar r = grid_sph_t<Conf>::radius(x);
     // return Bp / (r * r);
     return Bp * 2.0 * cos(theta) / cube(r);
@@ -101,13 +90,8 @@ main(int argc, char *argv[]) {
 
   // Fill the magnetosphere with pairs
   ptc_injector_dynamic<Conf> injector(grid);
-  //ppc is particle per cell which doesn't have to do with density!!
-  //initialize grid with all the same number of particles per cell, but then you might have density gradient so each particle has different weights
-  //this just basically specifies the weight of particles
-  //we have a log_r grid! --> this allows so that the spacing in r grows same way spacing in theta grows so squares stay squares
   injector.inject_pairs(
       [] LAMBDA(auto &pos, auto &grid, auto &ext) { return true; },
-      //specify momentum distribution 
       [ppc] LAMBDA(auto &pos, auto &grid, auto &ext) { return 2 * ppc; },
       [kT] LAMBDA(auto &x_global, rand_state &state, PtcType type) {
         return rng_maxwell_juttner_3d<value_t>(state, kT);
@@ -117,7 +101,6 @@ main(int argc, char *argv[]) {
             exec_policy_dynamic<Conf>::grid());
         auto r = grid.radius(x_global[0]);
         auto th = grid.theta(x_global[1]);
-        //return the density distribution (which is implicitly r^(-3))
         return rho0 * math::sin(th) / qe / ppc;
       });
 

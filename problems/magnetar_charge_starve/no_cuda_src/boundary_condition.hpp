@@ -135,7 +135,7 @@ class boundary_condition : public system_t {
                 auto idx = idx_t(index_t<2>(n0, n1), ext);
                 //B_r=0,E_theta=0,E_phi=0
                 b[0][idx] = 0.0;
-                e[1][idx] = -omega *sin(theta_s) * r_s * b0[0][idx]*
+                e[1][idx] = -omega *sin(theta) * r_s * b0[0][idx]*
                             square(math::cos(M_PI * (theta - th_m) /
                                              (twist_th2 - twist_th1)));
                 e[2][idx] = 0.0;

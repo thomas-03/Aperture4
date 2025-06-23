@@ -23,7 +23,7 @@
 #include "systems/field_solver_sph.h"
 #include "systems/gather_tracked_ptc.h"
 #include "systems/grid_sph.hpp"
-#include "systems/policies/coord_policy_spherical_bounce.hpp"
+#include "systems/policies/coord_policy_spherical.hpp"
 //#include "systems/policies/coord_policy_spherical.hpp"
 #include "systems/policies/exec_policy_dynamic.hpp"
 #include "systems/ptc_injector_new.h"

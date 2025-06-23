@@ -1,0 +1,98 @@
+log_level = 1
+
+num_species = 2
+
+ion_mass = 1.0
+
+max_ptc_num = 200_000_000
+max_ph_num = 10_000_000
+ptc_buffer_size = 1_000_000
+ptc_segment_size = 20_000_000
+max_tracked_num = 10_000_000
+
+dt = 2.0e-4
+
+q_e = 1.0
+
+current_smoothing = 3
+
+use_pml = false
+
+use_implicit = false
+
+output_dir = "/storage1/fs1/yajiey/Active/Thomas/data/"
+
+### Simulation life time
+max_steps = 600000
+
+fld_output_interval = 500
+
+ptc_output_interval = 500
+
+tracked_fraction = 0.01
+
+snapshot_interval = 10000
+
+sort_interval = 23
+
+### Grid parameters
+# Number of grid points in each direction, excluding guard cells. This should be
+# a multiple of at least 32.
+N = [512,512]
+
+ranks = [2, 2]
+
+# Number of guard cells on each end. Effective number of cells per dimension
+# will be N + 2*guard. Minimum 2 is required!
+guard = [3, 3]
+
+# Lower limit of the coordinate
+lower = [0.0, 0.0] # set inner boundary to 2.7 r*
+
+# Size of the box in each dimension
+# exp(3.0) is about 20
+size = [1.7, 3.141593]
+
+# Whether boundaries are periodic
+periodic_boundary = [false, false]
+
+# Whether to use PML damping
+damping_boundary = [false, false, false, false]
+
+# Field output downsample factor
+downsample = 1
+momentum_downsample = 4
+
+# Parameters for cooling
+cooling = false
+emit_photons = false
+sync_cooling_coef = 1.0e-5
+# sync_cooling_coef = 0.0
+
+B_Q = 1.0e8
+Bp = 5.0e3
+kT = 1.0e-3
+#sigma = 2.5e3
+ppc = 10
+# rho0 = 0.0
+rho0 = 1.0e4
+
+ph_num_bins = 128
+sync_spec_lower = 1.0e-8
+sync_spec_upper = 1.0
+ph_dist_n_th = 32
+ph_dist_n_phi = 64
+IC_bb_kT = 1.0e-7
+IC_bg_spectrum = "black_body"
+ph_spec_lower = 1.0e-6
+ph_spec_upper = 1.0e1
+produce_pairs = false
+
+# Parameters for fast wave
+w0 = 0.05
+wave_freq = 2.0
+num_lambda = 3
+# prof_thick = 1.0
+twist_th1 = 0.75
+twist_th2 = 0.85
+

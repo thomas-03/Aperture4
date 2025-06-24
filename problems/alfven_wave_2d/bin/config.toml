@@ -23,7 +23,7 @@ use_implicit = false
 output_dir = "/storage1/fs1/yajiey/Active/Thomas/data/"
 
 ### Simulation life time
-max_steps = 600000
+max_steps = 60000
 
 fld_output_interval = 500
 

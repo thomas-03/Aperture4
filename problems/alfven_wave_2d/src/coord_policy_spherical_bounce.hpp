@@ -120,6 +120,7 @@ class coord_policy_spherical_base_bounce {
     if(x_global_sph_new[0] <= 0.0f) {
       // If the radius is negative, we bounce back
       x_global_sph_new[0] = -x_global_sph_new[0];
+      //fix the stuff with r in order to make it proper because of the exponential
       context.p[0] = -context.p[0];  // Reverse the radial momentum
     }
 

@@ -34,7 +34,7 @@
 using namespace std;
 using namespace Aperture;
 namespace Aperture{
-  template class field_solver<Config<2>, exec_policy_gpu, coord_policy_spherical_bounce>;
+  template class ptc_updater<Config<2>, exec_policy_gpu, coord_policy_spherical_bounce>;
 }
 
 int

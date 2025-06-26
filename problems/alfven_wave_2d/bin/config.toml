@@ -20,7 +20,7 @@ use_pml = false
 
 use_implicit = false
 
-output_dir = "/storage1/fs1/yajiey/Active/Thomas/data/"
+output_dir = "/storage1/fs1/yajiey/Active/Thomas/correctedRun/"
 
 ### Simulation life time
 max_steps = 60000

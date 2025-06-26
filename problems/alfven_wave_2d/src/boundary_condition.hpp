@@ -107,7 +107,7 @@ class boundary_condition : public system_t {
                   //e[0][idx] = omega * b0[1][idx]*sin(theta);
 
                   //basic alfven wave launch 
-                  //e[0][idx] = omega *b0[1][idx];
+                  e[0][idx] = omega *b0[1][idx];
                   b[1][idx] = 0.0; // Fast wave
                   b[2][idx] = 0.0; // Alfven wave
                 }

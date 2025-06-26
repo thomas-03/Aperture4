@@ -122,7 +122,8 @@ class coord_policy_spherical_base_bounce {
 
       //x_global_sph_new[0] is the log radius so to get the true radius we need to exponentiate it
       //we then need to reverse it by taking the negative and then log it again
-      x_global_sph_new[0] = log(-1.0*math::exp(x_global_sph_new[0]));
+      //x_global_sph_new[0] = log(-1.0*math::exp(x_global_sph_new[0]));
+      x_global_sph_new[0] = -1.0*x_global_sph_new[0];
       
       //note to self, do we have to do the weird log stuff for the momentum as well? or should it be fine as is?
       context.p[0] = -context.p[0];  // Reverse the radial momentum

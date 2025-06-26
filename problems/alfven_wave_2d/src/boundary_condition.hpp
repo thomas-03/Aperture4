@@ -95,7 +95,7 @@ class boundary_condition : public system_t {
                 //value_t th_m = (twist_th1 + twist_th2) * 0.5f;
                 //value_t sigma = abs(twist_th2 - twist_th1) / 6.0f;
 
-              if (theta >= twist_th1 && theta <= twist_th2){
+              if (theta >= twist_th1 && theta < twist_th2){
                 // For quantities that are not continuous across the surface
                 for (int n0 = 0; n0 < grid.guard[0]; n0++) {
                   auto idx = idx_t(index_t<2>(n0, n1), ext);

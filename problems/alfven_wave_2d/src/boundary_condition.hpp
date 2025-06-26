@@ -89,27 +89,44 @@ class boundary_condition : public system_t {
             auto& grid = ExecPolicy<Conf>::grid();
             auto ext = grid.extent();
             ExecPolicy<Conf>::loop(0, grid.dims[1], [&] LAMBDA(auto n1) {
-              // For quantities that are not continuous across the surface
               // int n0 = grid.guard[0];
 
-                value_t theta =
+                value_t theta_s =
                     grid_sph_t<Conf>::theta(grid.coord(1, n1, true));
+                value_t theta = grid_sph_t<Conf>::theta(grid.coord(1, n1, false));
+                //value_t th_m = (twist_th1 + twist_th2) * 0.5f;
+                //value_t sigma = abs(twist_th2 - twist_th1) / 6.0f;
 
-              if (theta >= twist_th1 && theta < twist_th2){
+              if (theta_s >= twist_th1 && theta_s < twist_th2){
+                // For quantities that are not continuous across the surface
                 for (int n0 = 0; n0 < grid.guard[0]; n0++) {
-                  value_t r = grid_sph_t<Conf>::radius(grid.coord(0, n0, true));
                   auto idx = idx_t(index_t<2>(n0, n1), ext);
-                  e[0][idx] = omega * b0[1][idx]; // Alfven wave
+                  //alfven wave launch with gaussian profile (??)
+                  //e[0][idx] = omega**exp(-0.5*pow((theta_s - th_m)/sigma,2.)) * b0[1][idx]*sin(theta_s); 
+
+                  //alfven wave launch with proper (??) coefficients
+                  //E_r is at the max at pi/2
+                  e[0][idx] = omega * b0[1][idx]*sin(theta_s);
+
+                  //basic alfven wave launch 
+                  //e[0][idx] = omega *b0[1][idx];
                   b[1][idx] = 0.0; // Fast wave
                   b[2][idx] = 0.0; // Alfven wave
                 }
-              // For quantities that are continuous across the surface
-              for (int n0 = 0; n0 < grid.guard[0] + 1; n0++) {
-                value_t r = grid_sph_t<Conf>::radius(grid.coord(0, n0, true));
-                // n0 = grid.guard[0] + 1;
-                auto idx2 = idx_t(index_t<2>(n0, n1), ext);
+
+                // For quantities that are continuous across the surface
+                for (int n0 = 0; n0 < grid.guard[0] + 1; n0++) {
+                  auto idx2 = idx_t(index_t<2>(n0, n1), ext);
                   b[0][idx2] = 0.0;
-                  e[1][idx2] = -omega * b0[0][idx2]; // Alfven wave
+                  //alfven wave launch with gaussian profile (??)
+                  //e[1][idx2] = -omega * r*2.0*exp(-0.5*pow((theta - th_m)/sigma,2.)) * b0[0][idx2]*cos(theta);
+
+                  //alfven wave launch with proper (??) coefficients
+                  //E_theta is at the max at 0 or pi
+                  e[1][idx2] = -omega *2.0 * b0[0][idx2]*cos(theta); // Alfven wave
+
+                  //basic alfven wave launch
+                  //e[1][idx2] = -omega * b0[0][idx2];
                   e[2][idx2] = 0.0; // Fast wave
                 }
               }

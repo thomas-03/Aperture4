@@ -92,8 +92,8 @@ class boundary_condition : public system_t {
               // int n0 = grid.guard[0];
 
                 value_t theta = grid_sph_t<Conf>::theta(grid.coord(1, n1, false));
-                //value_t th_m = (twist_th1 + twist_th2) * 0.5f;
-                //value_t sigma = abs(twist_th2 - twist_th1) / 6.0f;
+                value_t th_m = (twist_th1 + twist_th2) * 0.5f;
+                value_t sigma = abs(twist_th2 - twist_th1) / 6.0f;
 
               if (theta >= twist_th1 && theta < twist_th2){
                 // For quantities that are not continuous across the surface
@@ -107,7 +107,8 @@ class boundary_condition : public system_t {
                   //e[0][idx] = omega * b0[1][idx]*sin(theta);
 
                   //basic alfven wave launch 
-                  e[0][idx] = omega *b0[1][idx];
+                  //e[0][idx] = omega *b0[1][idx];
+		  //e[0][idx] = 0.0;
                   b[1][idx] = 0.0; // Fast wave
                   b[2][idx] = 0.0; // Alfven wave
                 }
@@ -115,16 +116,19 @@ class boundary_condition : public system_t {
                 // For quantities that are continuous across the surface
                 for (int n0 = 0; n0 < grid.guard[0] + 1; n0++) {
                   auto idx2 = idx_t(index_t<2>(n0, n1), ext);
+		  value_t r = grid_sph_t<Conf>::radius(grid.coord(0,n0,false));
                   b[0][idx2] = 0.0;
                   //alfven wave launch with gaussian profile (??)
-                  //e[1][idx2] = -omega * r*2.0*exp(-0.5*pow((theta - th_m)/sigma,2.)) * b0[0][idx2]*cos(theta);
+		  //it doesn't matter whether we do the cos(theta) or sin(theta) version, it doesn't change it much besides changing amplitude a bit
+                  e[1][idx2] = -omega * r*2.0*cos(theta)*exp(-0.5*pow((theta - th_m)/sigma,2.)) * b0[0][idx2];
+		  //e[1][idx2] = -omega*r*sin(theta)*exp(-0.5*pow((theta-th_m)/sigma,2.))*b0[0][idx2];
 
                   //alfven wave launch with proper (??) coefficients
                   //E_theta is at the max at 0 or pi
                   //e[1][idx2] = -omega *2.0 * b0[0][idx2]*cos(theta); // Alfven wave
 
                   //basic alfven wave launch
-                  e[1][idx2] = -omega * b0[0][idx2];
+                  //e[1][idx2] = -omega * b0[0][idx2];
 
                   e[2][idx2] = 0.0; // Fast wave
                 }

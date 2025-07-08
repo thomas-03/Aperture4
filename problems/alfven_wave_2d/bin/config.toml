@@ -10,7 +10,7 @@ ptc_buffer_size = 1_000_000
 ptc_segment_size = 20_000_000
 max_tracked_num = 10_000_000
 
-dt = 2.0e-4
+dt = 4.0e-4
 
 q_e = 1.0
 
@@ -20,25 +20,25 @@ use_pml = false
 
 use_implicit = false
 
-output_dir = "/storage1/fs1/yajiey/Active/Thomas/correctedRun/"
+output_dir = "/storage1/fs1/yajiey/Active/Thomas/gaussian_launch_8b/"
 
 ### Simulation life time
-max_steps = 60000
+max_steps = 25000
 
-fld_output_interval = 500
+fld_output_interval = 250
 
-ptc_output_interval = 500
+ptc_output_interval = 250
 
 tracked_fraction = 0.01
 
-snapshot_interval = 10000
+snapshot_interval = 50000
 
 sort_interval = 23
 
 ### Grid parameters
 # Number of grid points in each direction, excluding guard cells. This should be
 # a multiple of at least 32.
-N = [512,512]
+N = [1024,2048]
 
 ranks = [1, 1]
 
@@ -51,7 +51,7 @@ lower = [0.0, 0.0] # set inner boundary to 2.7 r*
 
 # Size of the box in each dimension
 # exp(3.0) is about 20
-size = [1.7, 3.141593]
+size = [1.8, 3.141593]
 
 # Whether boundaries are periodic
 periodic_boundary = [false, false]
@@ -60,7 +60,7 @@ periodic_boundary = [false, false]
 damping_boundary = [false, false, false, false]
 
 # Field output downsample factor
-downsample = 1
+downsample = 2
 momentum_downsample = 4
 
 # Parameters for cooling
@@ -75,7 +75,7 @@ kT = 1.0e-3
 #sigma = 2.5e3
 ppc = 10
 # rho0 = 0.0
-rho0 = 1.0e4
+rho0 = 8.0e4
 
 ph_num_bins = 128
 sync_spec_lower = 1.0e-8

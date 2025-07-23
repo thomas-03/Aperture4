@@ -84,19 +84,25 @@ class boundary_condition : public system_t {
       else
         omega = 0.0;
 
+      //Logger::print_info("omega: {}, phase: {}, w0: {}",omega,phase,m_w0);
+
       ExecPolicy<Conf>::launch(
-          [omega, Bp, twist_th1, twist_th2] LAMBDA(auto e, auto b, auto e0, auto b0) {
+          [omega, Bp, twist_th1, twist_th2,phase] LAMBDA(auto e, auto b, auto e0, auto b0) {
             auto& grid = ExecPolicy<Conf>::grid();
             auto ext = grid.extent();
+
+	    //loop over theta
             ExecPolicy<Conf>::loop(0, grid.dims[1], [&] LAMBDA(auto n1) {
               // int n0 = grid.guard[0];
 
                 value_t theta = grid_sph_t<Conf>::theta(grid.coord(1, n1, false));
                 value_t th_m = (twist_th1 + twist_th2) * 0.5f;
                 value_t sigma = abs(twist_th2 - twist_th1) / 6.0f;
+		value_t diff = abs(twist_th2 - twist_th1);
 
               if (theta >= twist_th1 && theta < twist_th2){
                 // For quantities that are not continuous across the surface
+		// loop over radius
                 for (int n0 = 0; n0 < grid.guard[0]; n0++) {
                   auto idx = idx_t(index_t<2>(n0, n1), ext);
                   //alfven wave launch with gaussian profile (??)
@@ -120,7 +126,15 @@ class boundary_condition : public system_t {
                   b[0][idx2] = 0.0;
                   //alfven wave launch with gaussian profile (??)
 		  //it doesn't matter whether we do the cos(theta) or sin(theta) version, it doesn't change it much besides changing amplitude a bit
-                  e[1][idx2] = -omega * r*2.0*cos(theta)*exp(-0.5*pow((theta - th_m)/sigma,2.)) * b0[0][idx2];
+                  //e[1][idx2] = -omega * r*2.0*cos(theta)*exp(-0.5*pow((theta - th_m)/sigma,2.)) * b0[0][idx2];
+
+		  //dominic's profile
+		  e[1][idx2] = -omega*sin(theta)*b0[0][idx2]*pow(cos(M_PI*(theta-th_m)/diff),2.);
+		  /*
+		  if(abs(theta-th_m)<5e-4 && r>1.0){
+		  	printf("n0: %d, theta: %f, radius: %f, phase: %f, omega: %f, e_th: %f \n",n0,theta,r,phase,omega,e[1][idx2]);
+		  }*/
+		  
 		  //e[1][idx2] = -omega*r*sin(theta)*exp(-0.5*pow((theta-th_m)/sigma,2.))*b0[0][idx2];
 
                   //alfven wave launch with proper (??) coefficients
@@ -132,11 +146,25 @@ class boundary_condition : public system_t {
 
                   e[2][idx2] = 0.0; // Fast wave
                 }
+	  	/*	
+		value_t r = grid_sph_t<Conf>::radius(grid.coord(0,7,false));
+		auto idx3 = idx_t(index_t<2>(7,n1),ext);
+		if(abs(theta-th_m)<5e-4 && r>1.0){
+			printf("theta: %f, radius: %f,phase: %f, omega: %f, e_th: %f \n", theta,r,phase,omega,e[1][idx3]);
+		}*/
               }
             });
           },
           E, B, E0, B0);
       ExecPolicy<Conf>::sync();
+      /*	
+      auto& grid = ExecPolicy<Conf>::grid();
+      auto ext = grid.extent();  
+      auto idx = idx_t(index_t<2>(5,205),ext);
+      value_t theta = grid_sph_t<Conf>::theta(grid.coord(1,205,false));
+      value_t r = grid_sph_t<Conf>::radius(grid.coord(1,5,false));
+      Logger::print_info("theta: {}, radius: {}, E2: {}, B3: {}",theta,r,E[1][idx]);
+      */
     }
   }
 };

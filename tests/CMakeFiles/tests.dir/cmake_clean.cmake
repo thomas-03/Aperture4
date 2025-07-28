@@ -1,0 +1,40 @@
+file(REMOVE_RECURSE
+  "../bin/tests"
+  "../bin/tests.pdb"
+  "CMakeFiles/tests.dir/cmake_device_link.o"
+  "CMakeFiles/tests.dir/test_buffer.cpp.o"
+  "CMakeFiles/tests.dir/test_buffer.cpp.o.d"
+  "CMakeFiles/tests.dir/test_config.cpp.o"
+  "CMakeFiles/tests.dir/test_config.cpp.o.d"
+  "CMakeFiles/tests.dir/test_exporter.cpp.o"
+  "CMakeFiles/tests.dir/test_exporter.cpp.o.d"
+  "CMakeFiles/tests.dir/test_fields.cpp.o"
+  "CMakeFiles/tests.dir/test_fields.cpp.o.d"
+  "CMakeFiles/tests.dir/test_gaussian_quadrature.cpp.o"
+  "CMakeFiles/tests.dir/test_gaussian_quadrature.cpp.o.d"
+  "CMakeFiles/tests.dir/test_gr_ks_sph.cpp.o"
+  "CMakeFiles/tests.dir/test_gr_ks_sph.cpp.o.d"
+  "CMakeFiles/tests.dir/test_interp.cpp.o"
+  "CMakeFiles/tests.dir/test_interp.cpp.o.d"
+  "CMakeFiles/tests.dir/test_lorentz.cpp.o"
+  "CMakeFiles/tests.dir/test_lorentz.cpp.o.d"
+  "CMakeFiles/tests.dir/test_mem_layout.cpp.o"
+  "CMakeFiles/tests.dir/test_mem_layout.cpp.o.d"
+  "CMakeFiles/tests.dir/test_multi_array.cpp.o"
+  "CMakeFiles/tests.dir/test_multi_array.cpp.o.d"
+  "CMakeFiles/tests.dir/test_params.cpp.o"
+  "CMakeFiles/tests.dir/test_params.cpp.o.d"
+  "CMakeFiles/tests.dir/test_particles.cpp.o"
+  "CMakeFiles/tests.dir/test_particles.cpp.o.d"
+  "CMakeFiles/tests.dir/test_rng.cpp.o"
+  "CMakeFiles/tests.dir/test_rng.cpp.o.d"
+  "CMakeFiles/tests.dir/test_singleton.cpp.o"
+  "CMakeFiles/tests.dir/test_singleton.cpp.o.d"
+  "CMakeFiles/tests.dir/test_util_functions.cpp.o"
+  "CMakeFiles/tests.dir/test_util_functions.cpp.o.d"
+)
+
+# Per-language clean rules from dependency scanning.
+foreach(lang CXX)
+  include(CMakeFiles/tests.dir/cmake_clean_${lang}.cmake OPTIONAL)
+endforeach()

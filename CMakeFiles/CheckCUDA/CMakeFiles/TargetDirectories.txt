@@ -1,0 +1,2 @@
+/storage1/fs1/yajiey/Active/Thomas/Aperture4/CMakeFiles/CheckCUDA/CMakeFiles/edit_cache.dir
+/storage1/fs1/yajiey/Active/Thomas/Aperture4/CMakeFiles/CheckCUDA/CMakeFiles/rebuild_cache.dir

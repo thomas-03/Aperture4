@@ -23,7 +23,7 @@
 #include "systems/field_solver_sph.h"
 #include "systems/gather_tracked_ptc.h"
 #include "systems/grid_sph.hpp"
-//#include "coord_policy_spherical_bounce.hpp"
+#include "coord_policy_spherical_bounce.hpp"
 #include "systems/policies/coord_policy_spherical_gca.hpp"
 #include "systems/policies/exec_policy_dynamic.hpp"
 #include "systems/ptc_injector_new.h"
@@ -33,9 +33,9 @@
 
 using namespace std;
 using namespace Aperture;
-namespace Aperture{
+/*namespace Aperture{
   template class ptc_updater<Config<2>, exec_policy_dynamic, coord_policy_spherical_gca>;
-}
+}*/
 
 int
 main(int argc, char *argv[]) {

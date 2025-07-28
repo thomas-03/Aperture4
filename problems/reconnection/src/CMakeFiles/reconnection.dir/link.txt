@@ -1,0 +1,2 @@
+/usr/bin/ar qc libreconnection.a CMakeFiles/reconnection.dir/initial_condition.cpp.o CMakeFiles/reconnection.dir/systems/boundary_condition.hip.cpp.o
+/usr/bin/ranlib libreconnection.a

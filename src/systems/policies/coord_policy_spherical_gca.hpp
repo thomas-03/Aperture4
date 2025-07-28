@@ -57,7 +57,6 @@ class coord_policy_spherical_gca : public coord_policy_spherical<Conf> {
 
   HD_INLINE static vec_t<value_t, 3> f_v_E(const vec_t<value_t, 3>& E,
                                            const vec_t<value_t, 3>& B) {
-    //printf("fve beginning \n");
     value_t EB_sqr = E.dot(E) + B.dot(B);
     // w_E[0] = (E[1] * B[2] - E[2] * B[1]) / EB_sqr;
     // w_E[1] = (E[2] * B[0] - E[0] * B[2]) / EB_sqr;
@@ -71,7 +70,6 @@ class coord_policy_spherical_gca : public coord_policy_spherical<Conf> {
       w_E *= (1.0f - math::sqrt(max(1.0f - 4.0f * w2, 0.0f))) * 0.5f / w2;
       return w_E;
     }
-    //printf("fve end \n");
   }
 
   HD_INLINE static value_t f_Gamma(value_t u_par, value_t mu, value_t B_mag,
@@ -90,17 +88,11 @@ class coord_policy_spherical_gca : public coord_policy_spherical<Conf> {
     if (check_flag(context.flag, PtcFlag::ignore_EM)) {
       return;
     }
-    vec_t<value_t, 3> x_global_old(
-        grid.template coord<0>(pos[0], context.x[0]),
-        grid.template coord<1>(pos[1], context.x[1]),
-        grid.template coord<2>(pos[2], context.x[2]));
-    //printf("coord is %f, %f\n", x_global_old[0], x_global_old[1]);
     // In this GCA pusher, p[0] is taken to be u_par, p[1] is taken to be the
     // magnetic moment mu.
-    //printf("update_ptc beginning \n");
     value_t u_par = context.p[0];
     value_t mu = context.p[1];
-    
+
     // printf("u_par is %f, mu is %f\n", u_par, mu);
 
     // Compute the E x B drift velocity
@@ -124,8 +116,7 @@ class coord_policy_spherical_gca : public coord_policy_spherical<Conf> {
     // printf("u_par_new is %f, Gamma_new is %f, E_par is %f\n", u_par_new,
     // Gamma_new, E_par);
 
-    //auto x_global = grid.coord_global(pos, context.x);
-    auto x_global = x_global_old;
+    auto x_global = grid.coord_global(pos, context.x);
     auto x_iter = x_global;
     auto pos_iter = pos;
     auto interp = interp_t<1, Conf::dim>{};
@@ -139,10 +130,9 @@ class coord_policy_spherical_gca : public coord_policy_spherical<Conf> {
     constexpr int n_iter = 5;
     for (int i = 0; i < n_iter; i++) {
       // TODO: dx is not correct. Need to transform to Cartesian, evaluate, then transform back?
-      //printf("first x_iter is (%f, %f, %f)\n",x_iter[0],x_iter[1],x_iter[2]);
       move_ptc_gca(grid, x_iter, b, B_iter, vE, vE_iter,
                  Gamma_new, context.gamma, u_par_new, dt);
-      //printf("x_iter is (%f, %f, %f)\n", x_iter[0], x_iter[1], x_iter[2]);
+      // printf("x_iter is (%f, %f, %f)\n", x_iter[0], x_iter[1], x_iter[2]);
 
       grid.from_global(x_iter, pos_iter, context.new_x);
       auto idx_iter = Conf::idx(pos_iter, ext);
@@ -173,13 +163,12 @@ class coord_policy_spherical_gca : public coord_policy_spherical<Conf> {
     for (int i = Conf::dim; i < 3; i++) {
       context.new_x[i] = x_iter[i];
     }
-     //printf("old_x (%f, %f, %f), new_x (%f, %f, %f), gamma is %f\n",
-     //       context.x[0], context.x[1], context.x[2], context.new_x[0],
-     //       context.new_x[1], context.new_x[2], context.gamma);
+    // printf("old_x (%f, %f, %f), new_x (%f, %f, %f), gamma is %f\n",
+    //        context.x[0], context.x[1], context.x[2], context.new_x[0],
+    //        context.new_x[1], context.new_x[2], context.gamma);
     pos = pos_iter;
     context.p[0] = u_par_new;
     context.p[1] = mu;
-    //printf("update_ptc end\n");
   }
 
   HD_INLINE void move_ptc_gca(const Grid<Conf::dim, value_t>& grid,
@@ -191,10 +180,9 @@ class coord_policy_spherical_gca : public coord_policy_spherical<Conf> {
                               value_t gamma, value_t gamma_iter,
                               value_t u_par, value_t dt) const {
     using grid_type = grid_sph_t<Conf>;
-    //printf("move ptc gca beginning \n");
     // Transform the momentum vector to cartesian at the current location
     vec_t<value_t, 3> x_global_cart = grid_type::coord_to_cart(x_global);
-    printf("cart x (%f , %f, %f)",x_global_cart[0],x_global_cart[1],x_global_cart[2]);
+
     // Transform the b vector to cartesian at the current location
     grid_type::vec_to_cart(b, x_global);
     grid_type::vec_to_cart(b_iter, x_global);
@@ -207,7 +195,6 @@ class coord_policy_spherical_gca : public coord_policy_spherical<Conf> {
 
     // Compute the new spherical location
     x_global = grid_type::coord_from_cart(x_global_cart);
-    //printf("move ptc gca end \n");
   }
 
  private:

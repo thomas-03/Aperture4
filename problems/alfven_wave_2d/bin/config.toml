@@ -6,9 +6,9 @@ ion_mass = 1.0
 
 max_ptc_num = 200_000_000
 max_ph_num = 10_000_000
-ptc_buffer_size = 1_000_000
-ptc_segment_size = 20_000_000
-max_tracked_num = 10_000_000
+ptc_buffer_size = 2_000_000
+ptc_segment_size = 10_000_000
+max_tracked_num = 20_000_000
 
 dt = 4.0e-4
 
@@ -20,10 +20,10 @@ use_pml = false
 
 use_implicit = false
 
-output_dir = "/storage1/fs1/yajiey/Active/Thomas/diffgaussian_B2e4_kTe2_w02_rho2_bigTh_killbounce_biggrid_gca/"
+output_dir = "/storage1/fs1/yajiey/Active/Thomas/temp/"
 
 ### Simulation life time
-max_steps = 87500
+max_steps = 500
 
 fld_output_interval = 250
 
@@ -38,9 +38,9 @@ sort_interval = 23
 ### Grid parameters
 # Number of grid points in each direction, excluding guard cells. This should be
 # a multiple of at least 32.
-N = [2048,4096]
+N = [1024,1024]
 
-ranks = [2, 2]
+ranks = [1,1]
 
 # Number of guard cells on each end. Effective number of cells per dimension
 # will be N + 2*guard. Minimum 2 is required!

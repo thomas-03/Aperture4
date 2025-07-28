@@ -1,0 +1,43 @@
+file(REMOVE_RECURSE
+  "CMakeFiles/Aperture_dev.dir/core/buffer_impl.hip.cpp.o"
+  "CMakeFiles/Aperture_dev.dir/core/buffer_impl.hip.cpp.o.d"
+  "CMakeFiles/Aperture_dev.dir/core/constant_mem.hip.cpp.o"
+  "CMakeFiles/Aperture_dev.dir/core/constant_mem.hip.cpp.o.d"
+  "CMakeFiles/Aperture_dev.dir/core/detail/multi_array_helpers.hip.cpp.o"
+  "CMakeFiles/Aperture_dev.dir/core/detail/multi_array_helpers.hip.cpp.o.d"
+  "CMakeFiles/Aperture_dev.dir/core/particles_functions.hip.cpp.o"
+  "CMakeFiles/Aperture_dev.dir/core/particles_functions.hip.cpp.o.d"
+  "CMakeFiles/Aperture_dev.dir/data/rng_states.hip.cpp.o"
+  "CMakeFiles/Aperture_dev.dir/data/rng_states.hip.cpp.o.d"
+  "CMakeFiles/Aperture_dev.dir/systems/compute_moments.hip.cpp.o"
+  "CMakeFiles/Aperture_dev.dir/systems/compute_moments.hip.cpp.o.d"
+  "CMakeFiles/Aperture_dev.dir/systems/compute_moments_gr_ks.hip.cpp.o"
+  "CMakeFiles/Aperture_dev.dir/systems/compute_moments_gr_ks.hip.cpp.o.d"
+  "CMakeFiles/Aperture_dev.dir/systems/data_exporter.hip.cpp.o"
+  "CMakeFiles/Aperture_dev.dir/systems/data_exporter.hip.cpp.o.d"
+  "CMakeFiles/Aperture_dev.dir/systems/domain_comm.hip.cpp.o"
+  "CMakeFiles/Aperture_dev.dir/systems/domain_comm.hip.cpp.o.d"
+  "CMakeFiles/Aperture_dev.dir/systems/field_solver_cartesian.hip.cpp.o"
+  "CMakeFiles/Aperture_dev.dir/systems/field_solver_cartesian.hip.cpp.o.d"
+  "CMakeFiles/Aperture_dev.dir/systems/field_solver_gr_ks.hip.cpp.o"
+  "CMakeFiles/Aperture_dev.dir/systems/field_solver_gr_ks.hip.cpp.o.d"
+  "CMakeFiles/Aperture_dev.dir/systems/field_solver_sph.hip.cpp.o"
+  "CMakeFiles/Aperture_dev.dir/systems/field_solver_sph.hip.cpp.o.d"
+  "CMakeFiles/Aperture_dev.dir/systems/gather_momentum_space.hip.cpp.o"
+  "CMakeFiles/Aperture_dev.dir/systems/gather_momentum_space.hip.cpp.o.d"
+  "CMakeFiles/Aperture_dev.dir/systems/gather_tracked_ptc.hip.cpp.o"
+  "CMakeFiles/Aperture_dev.dir/systems/gather_tracked_ptc.hip.cpp.o.d"
+  "CMakeFiles/Aperture_dev.dir/systems/ptc_updater.hip.cpp.o"
+  "CMakeFiles/Aperture_dev.dir/systems/ptc_updater.hip.cpp.o.d"
+  "CMakeFiles/Aperture_dev.dir/systems/radiative_transfer.hip.cpp.o"
+  "CMakeFiles/Aperture_dev.dir/systems/radiative_transfer.hip.cpp.o.d"
+  "CMakeFiles/Aperture_dev.dir/systems/vlasov_solver.hip.cpp.o"
+  "CMakeFiles/Aperture_dev.dir/systems/vlasov_solver.hip.cpp.o.d"
+  "libAperture_dev.a"
+  "libAperture_dev.pdb"
+)
+
+# Per-language clean rules from dependency scanning.
+foreach(lang CUDA)
+  include(CMakeFiles/Aperture_dev.dir/cmake_clean_${lang}.cmake OPTIONAL)
+endforeach()

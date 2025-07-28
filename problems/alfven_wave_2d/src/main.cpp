@@ -23,8 +23,8 @@
 #include "systems/field_solver_sph.h"
 #include "systems/gather_tracked_ptc.h"
 #include "systems/grid_sph.hpp"
-#include "coord_policy_spherical_bounce.hpp"
-//#include "systems/policies/coord_policy_spherical.hpp"
+//#include "coord_policy_spherical_bounce.hpp"
+#include "systems/policies/coord_policy_spherical_gca.hpp"
 #include "systems/policies/exec_policy_dynamic.hpp"
 #include "systems/ptc_injector_new.h"
 #include "systems/ptc_updater_impl.hpp"
@@ -33,9 +33,9 @@
 
 using namespace std;
 using namespace Aperture;
-namespace Aperture{
-  template class ptc_updater<Config<2>, exec_policy_gpu, coord_policy_spherical_bounce>;
-}
+/*namespace Aperture{
+  template class ptc_updater<Config<2>, exec_policy_dynamic, coord_policy_spherical_gca>;
+}*/
 
 int
 main(int argc, char *argv[]) {
@@ -46,8 +46,8 @@ main(int argc, char *argv[]) {
   domain_comm<Conf, exec_policy_dynamic> comm;
   grid_sph_t<Conf> grid(comm);
   auto pusher =
-      env.register_system<ptc_updater<Conf, exec_policy_dynamic,
-                                      coord_policy_spherical_bounce>>(
+      env.register_system<ptc_updater<Conf, exec_policy_gpu,
+                                      coord_policy_spherical_gca>>(
           // coord_policy_spherical>>(
           grid, &comm);
   auto tracker =

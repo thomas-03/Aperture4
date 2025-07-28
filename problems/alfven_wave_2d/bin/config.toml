@@ -20,10 +20,10 @@ use_pml = false
 
 use_implicit = false
 
-output_dir = "/storage1/fs1/yajiey/Active/Thomas/gaussian_launch_8b/"
+output_dir = "/storage1/fs1/yajiey/Active/Thomas/diffgaussian_B2e4_kTe2_w02_rho2_bigTh_killbounce_biggrid_gca/"
 
 ### Simulation life time
-max_steps = 25000
+max_steps = 87500
 
 fld_output_interval = 250
 
@@ -38,16 +38,17 @@ sort_interval = 23
 ### Grid parameters
 # Number of grid points in each direction, excluding guard cells. This should be
 # a multiple of at least 32.
-N = [1024,2048]
+N = [2048,4096]
 
-ranks = [1, 1]
+ranks = [2, 2]
 
 # Number of guard cells on each end. Effective number of cells per dimension
 # will be N + 2*guard. Minimum 2 is required!
 guard = [3, 3]
 
 # Lower limit of the coordinate
-lower = [0.0, 0.0] # set inner boundary to 2.7 r*
+lower = [0.0, 0.0] 
+# set inner boundary to 2.7 r*
 
 # Size of the box in each dimension
 # exp(3.0) is about 20
@@ -70,12 +71,12 @@ sync_cooling_coef = 1.0e-5
 # sync_cooling_coef = 0.0
 
 B_Q = 1.0e8
-Bp = 5.0e3
-kT = 1.0e-3
+Bp = 2.0e4
+kT = 1.0e-2
 #sigma = 2.5e3
 ppc = 10
 # rho0 = 0.0
-rho0 = 8.0e4
+rho0 = 2.0e5
 
 ph_num_bins = 128
 sync_spec_lower = 1.0e-8
@@ -89,10 +90,11 @@ ph_spec_upper = 1.0e1
 produce_pairs = false
 
 # Parameters for fast wave
-w0 = 0.05
-wave_freq = 2.0
+w0 = 0.02
+wave_freq = 1.0
 num_lambda = 3
 # prof_thick = 1.0
-twist_th1 = 0.75
-twist_th2 = 0.85
+twist_th1 = 0.29
+twist_th2 = 0.34
+
 

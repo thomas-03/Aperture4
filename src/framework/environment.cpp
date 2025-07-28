@@ -160,7 +160,7 @@ sim_environment_impl::init() {
 
 void
 sim_environment_impl::update() {
-  if (step % perf_interval == 0 && step > 0) {
+  if (step % perf_interval == 0) {
     Logger::print_info("=== Time step {}, Time is {:.5f} ===", step, time);
   }
   // Call the update() method of each system in order

@@ -33,9 +33,9 @@
 
 using namespace std;
 using namespace Aperture;
-/*namespace Aperture{
+namespace Aperture{
   template class ptc_updater<Config<2>, exec_policy_dynamic, coord_policy_spherical_gca>;
-}*/
+}
 
 int
 main(int argc, char *argv[]) {

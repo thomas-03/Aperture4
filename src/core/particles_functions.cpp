@@ -199,9 +199,9 @@ ptc_sort_by_cell(exec_tags::host, particles_base<BufferType>& ptc,
     // 2nd: Defrag the whole particle array
     int last_segment = ptc.number() / ptc.sort_segment_size();
     for (int m = 0; m < last_segment; m++) {
-      // Logger::print_info(
-      //     "Filling segment {}, last_segment is {}, num_last is {}", m,
-      //     last_segment, m_segment_nums[last_segment]);
+       Logger::print_info(
+           "Filling segment {}, last_segment is {}, num_last is {}", m,
+           last_segment, ptc.segment_nums()[last_segment]);
 
       while (ptc.segment_nums()[m] < ptc.sort_segment_size()) {
         // deficit is how many "holes" do we have in this segment
@@ -224,7 +224,7 @@ ptc_sort_by_cell(exec_tags::host, particles_base<BufferType>& ptc,
 
         ptc.segment_nums()[m] += num_to_copy;
         ptc.segment_nums()[last_segment] -= num_to_copy;
-        // Logger::print_info("Segment num is {}", m_segment_nums[m]);
+         //Logger::print_info("Segment num is {}", m_segment_nums[m]);
 
         if (ptc.segment_nums()[last_segment] == 0) {
           last_segment -= 1;
@@ -240,8 +240,8 @@ ptc_sort_by_cell(exec_tags::host, particles_base<BufferType>& ptc,
     // // the new particle number
     // // if (m_partition[num_cells] != m_number) ptc.set_num(m_partition[num_cells]);
     // if (total_num != m_number) ptc.set_num(total_num);
-    // Logger::print_info("Sorting complete, there are {} particles in the pool",
-                       // total_num);
+     Logger::print_info("Sorting complete, there are {} particles in the pool",
+                        total_num);
   }
 }
 

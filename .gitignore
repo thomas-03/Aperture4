@@ -14,6 +14,9 @@ tmp/
 *.out
 *.un~
 *.h5
+*.o
+*.o.d
+*.a
 result*
 build*
 doc

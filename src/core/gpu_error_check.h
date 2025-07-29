@@ -64,7 +64,7 @@ inline void
 __gpuSafeCall(gpuError_t err, const char *file, const int line) {
 #ifdef GPU_ERROR_CHECK
   if (gpuSuccess != err) {
-    fprintf(stderr, "cudaSafeCall() failed at %s:%i : %s\n", file, line,
+    fprintf(stderr, "memory allocation error! cudaSafeCall() failed at %s:%i : %s\n", file, line,
             gpuGetErrorString(err));
     // gpuGetLastError();
     // exit(-1);

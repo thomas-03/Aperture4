@@ -19,6 +19,7 @@
 #include "framework/config.h"
 #include "framework/environment.h"
 #include "systems/compute_moments.h"
+#include "data/rng_states.h"
 #include "systems/data_exporter.h"
 #include "systems/field_solver_sph.h"
 #include "systems/gather_tracked_ptc.h"
@@ -82,6 +83,14 @@ main(int argc, char *argv[]) {
   env.params().get_value("kT", kT);
   env.params().get_value("rho0", rho0);
 
+  
+  particle_data_t *ptc;
+  rng_states_t *states;
+
+  env.get_data("rng_states", states);
+  env.get_data("particles", ptc);
+
+
   // Set dipole initial magnetic field
   B0->set_values(0, [Bp](Scalar x, Scalar theta, Scalar phi) { // sets the radial component of B_bg
     Scalar r = grid_sph_t<Conf>::radius(x);
@@ -108,13 +117,6 @@ main(int argc, char *argv[]) {
         auto th = grid.theta(x_global[1]);
         return rho0 * math::sin(th) / qe / ppc;
       });
-
-  
-  particle_data_t *ptc;
-  rng_states_t *states;
-
-  env.get_data("rng_states", &states);
-  env.get_data("particles", &ptc);
 
   env.run();
 

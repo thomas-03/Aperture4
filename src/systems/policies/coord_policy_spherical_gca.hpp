@@ -135,6 +135,13 @@ class coord_policy_spherical_gca : public coord_policy_spherical<Conf> {
       // printf("x_iter is (%f, %f, %f)\n", x_iter[0], x_iter[1], x_iter[2]);
 
       grid.from_global(x_iter, pos_iter, context.new_x);
+      
+      // Add bounds checking to prevent illegal memory access
+      if (!grid.is_in_bound(pos_iter)) {
+        // If particle moves out of bounds, stop iteration and keep previous values
+        break;
+      }
+      
       auto idx_iter = Conf::idx(pos_iter, ext);
 
       // Interpolate the E and B field at the new position
@@ -203,3 +210,4 @@ class coord_policy_spherical_gca : public coord_policy_spherical<Conf> {
 };
 
 }  // namespace Aperture
+

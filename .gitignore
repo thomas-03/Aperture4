@@ -17,6 +17,8 @@ tmp/
 *.o
 *.o.d
 *.a
+*.internal
+*.make 
 result*
 build*
 doc
@@ -55,6 +57,7 @@ Doxyfile
 /tests/test_new_index.cpp
 /tests/test_template.cpp
 /env/
+CMakeFiles/
 /.ignore
 /.clang-tidy
 /data

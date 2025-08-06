@@ -52,7 +52,7 @@ class boundary_condition : public system_t {
                      const domain_comm<Conf, ExecPolicy>* comm = nullptr)
       : m_grid(grid), m_comm(comm) {}
 
-  template <typename Conf> void inject_particles(particle_data_t& ptc, rng_states_t<exec_tags::device>& rng_states,
+void inject_particles(particle_data_t& ptc, rng_states_t<exec_tags::device>& rng_states,
                  buffer<float>& surface_n, int num_per_cell,
                  typename Conf::value_t weight,
                  const grid_curv_t<Conf>& grid,
@@ -209,6 +209,12 @@ class boundary_condition : public system_t {
           },
           E, B, E0, B0);
       ExecPolicy<Conf>::sync();
+    //if we are still actively injecting the wave, inject particles
+    if (phase < 2.0 * M_PI * m_num_lambda && step%1==0){
+          inject_particles(*ptc, *rand_states, m_surface_ne, m_surface_np, 1,
+                                  0.2, m_grid, wpert, 1);
+        
+    }
     }
   }
 };

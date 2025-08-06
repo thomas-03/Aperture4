@@ -62,8 +62,8 @@ class boundary_condition : public system_t {
 
   auto ptc_num = ptc.number();
   // First measure surface density
-  kernel_launch(
-      [ptc_num, rpert1, rpert2] __device__(auto ptc, auto surface_n) {
+  ExecPolicy<Conf>::launch(
+      [ptc_num, rpert1, rpert2] LAMBDA(auto ptc, auto surface_n) {
         auto& grid = dev_grid<Conf::dim, typename Conf::value_t>();
         auto ext = grid.extent();
         for (auto n : grid_stride_range(0, ptc_num)) {
@@ -84,7 +84,7 @@ class boundary_condition : public system_t {
         }
       },
       ptc.get_dev_ptrs(), surface_n.dev_ptr());
-  CudaSafeCall(cudaDeviceSynchronize());
+  ExecPolicy<Conf>::sync();
 
   Scalar th1 = math::acos(math::sqrt(1.0f - 1.0f / rpert1));
   Scalar th2 = math::acos(math::sqrt(1.0f - 1.0f / rpert2));
@@ -92,16 +92,14 @@ class boundary_condition : public system_t {
     swap_values(th1, th2);
 
   // Then inject particles
-  kernel_launch(
-      [ptc_num, weight, th1, th2] __device__(auto ptc, auto surface_n, auto num_inj,
-                                             auto states) {
+  ExecPolicy<Conf>::launch(
+      [ptc_num, weight, th1, th2] LAMBDA(auto ptc, auto surface_n, auto num_inj, auto states) {
         auto& grid = dev_grid<Conf::dim, typename Conf::value_t>();
         auto ext = grid.extent();
         int inj_n0 = grid.guard[0];
         // int id = threadIdx.x + blockIdx.x * blockDim.x;
         rng_t rng(states);
-        for (auto n1 :
-             grid_stride_range(grid.guard[1], grid.dims[1] - grid.guard[1])) {
+        for (auto n1 :grid_stride_range(grid.guard[1], grid.dims[1] - grid.guard[1])) {
           size_t offset = ptc_num + n1 * num_inj * 2;
           auto pos = index_t<Conf::dim>(inj_n0, n1);
           auto idx = typename Conf::idx_t(pos, ext);
@@ -113,9 +111,9 @@ class boundary_condition : public system_t {
           //     square(0.5f / grid.delta[1]) * math::sin(theta))
           //   continue;
           for (int i = 0; i < num_inj; i++) {
-            auto x2 = rng.uniform<float>();
+            auto x2 = rng.uniform<value_t>(state);
             theta = grid.template coord<1>(n1, x2);
-            auto p = 0.1 * rng.uniform<float>();
+            auto p = 0.1 * rng.uniform<value_t>(state);
             ptc.x1[offset + i * 2] = ptc.x1[offset + i * 2 + 1] = 0.5f;
             ptc.x2[offset + i * 2] = ptc.x2[offset + i * 2 + 1] = x2;
             ptc.x3[offset + i * 2] = ptc.x3[offset + i * 2 + 1] = 0.0f;
@@ -133,9 +131,8 @@ class boundary_condition : public system_t {
           }
         }
       },
-      ptc.get_dev_ptrs(), surface_n.dev_ptr(), num_per_cell,
-      rng_states.states().dev_ptr());
-  CudaSafeCall(cudaDeviceSynchronize());
+      ptc.get_dev_ptrs(), surface_n.dev_ptr(), num_per_cell,rng_states.states().dev_ptr());
+  ExecPolicy<Conf>::sync();
 
   ptc.add_num(num_per_cell * 2 * grid.dims[1]);
 }
@@ -193,16 +190,7 @@ class boundary_condition : public system_t {
 		// loop over radius
                 for (int n0 = 0; n0 < grid.guard[0]; n0++) {
                   auto idx = idx_t(index_t<2>(n0, n1), ext);
-                  //alfven wave launch with gaussian profile (??)
-                  //e[0][idx] = omega**exp(-0.5*pow((theta - th_m)/sigma,2.)) * b0[1][idx]*sin(theta); 
 
-                  //alfven wave launch with proper (??) coefficients
-                  //E_r is at the max at pi/2
-                  //e[0][idx] = omega * b0[1][idx]*sin(theta);
-
-                  //basic alfven wave launch 
-                  //e[0][idx] = omega *b0[1][idx];
-		  //e[0][idx] = 0.0;
                   b[1][idx] = 0.0; // Fast wave
                   b[2][idx] = 0.0; // Alfven wave
                 }
@@ -212,47 +200,17 @@ class boundary_condition : public system_t {
                   auto idx2 = idx_t(index_t<2>(n0, n1), ext);
 		  value_t r = grid_sph_t<Conf>::radius(grid.coord(0,n0,false));
                   b[0][idx2] = 0.0;
-                  //alfven wave launch with gaussian profile (??)
-		  //it doesn't matter whether we do the cos(theta) or sin(theta) version, it doesn't change it much besides changing amplitude a bit
-                  //e[1][idx2] = -omega * r*2.0*cos(theta)*exp(-0.5*pow((theta - th_m)/sigma,2.)) * b0[0][idx2];
 
-		  //dominic's profile
-		  e[1][idx2] = -omega*sin(theta)*b0[0][idx2]*pow(cos(M_PI*(theta-th_m)/diff),2.);
-		  /*
-		  if(abs(theta-th_m)<5e-4 && r>1.0){
-		  	printf("n0: %d, theta: %f, radius: %f, phase: %f, omega: %f, e_th: %f \n",n0,theta,r,phase,omega,e[1][idx2]);
-		  }*/
-		  
-		  //e[1][idx2] = -omega*r*sin(theta)*exp(-0.5*pow((theta-th_m)/sigma,2.))*b0[0][idx2];
-
-                  //alfven wave launch with proper (??) coefficients
-                  //E_theta is at the max at 0 or pi
-                  //e[1][idx2] = -omega *2.0 * b0[0][idx2]*cos(theta); // Alfven wave
-
-                  //basic alfven wave launch
-                  //e[1][idx2] = -omega * b0[0][idx2];
+		              //dominic's profile
+		              e[1][idx2] = -omega*sin(theta)*b0[0][idx2]*pow(cos(M_PI*(theta-th_m)/diff),2.);
 
                   e[2][idx2] = 0.0; // Fast wave
                 }
-	  	/*	
-		value_t r = grid_sph_t<Conf>::radius(grid.coord(0,7,false));
-		auto idx3 = idx_t(index_t<2>(7,n1),ext);
-		if(abs(theta-th_m)<5e-4 && r>1.0){
-			printf("theta: %f, radius: %f,phase: %f, omega: %f, e_th: %f \n", theta,r,phase,omega,e[1][idx3]);
-		}*/
               }
             });
           },
           E, B, E0, B0);
       ExecPolicy<Conf>::sync();
-      /*	
-      auto& grid = ExecPolicy<Conf>::grid();
-      auto ext = grid.extent();  
-      auto idx = idx_t(index_t<2>(5,205),ext);
-      value_t theta = grid_sph_t<Conf>::theta(grid.coord(1,205,false));
-      value_t r = grid_sph_t<Conf>::radius(grid.coord(1,5,false));
-      Logger::print_info("theta: {}, radius: {}, E2: {}, B3: {}",theta,r,E[1][idx]);
-      */
     }
   }
 };

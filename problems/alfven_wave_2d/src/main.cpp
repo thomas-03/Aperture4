@@ -91,7 +91,7 @@ main(int argc, char *argv[]) {
     return Bp * sin(theta) / cube(r);
   });
 
-  // Fill the magnetosphere with pairs
+  // Fill the magnetosphere with pairs the same as normal
   ptc_injector_dynamic<Conf> injector(grid);
   injector.inject_pairs(
       [] LAMBDA(auto &pos, auto &grid, auto &ext) { return true; },
@@ -106,6 +106,13 @@ main(int argc, char *argv[]) {
         auto th = grid.theta(x_global[1]);
         return rho0 * math::sin(th) / qe / ppc;
       });
+
+  
+  particle_data_t *ptc;
+  curand_states_t *states;
+
+  env.get_data("rand_states", &states);
+  env.get_data("particles", &ptc);
 
   env.run();
 

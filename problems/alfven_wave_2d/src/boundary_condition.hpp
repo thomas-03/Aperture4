@@ -25,6 +25,7 @@
 #include "systems/grid_sph.hpp"
 #include "utils/nonown_ptr.hpp"
 #include "utils/util_functions.h"
+#include "data/particle_data.h"
 #include <memory>
 
 namespace Aperture {
@@ -45,6 +46,11 @@ class boundary_condition : public system_t {
 
   nonown_ptr<vector_field<Conf>> E, B, E0, B0;
 
+  particle_data_t *ptc;
+  curand_states_t *rand_states;
+
+  buffer<float> m_surface_n;
+
  public:
   static std::string name() { return "boundary_condition"; }
 
@@ -55,15 +61,13 @@ class boundary_condition : public system_t {
 void inject_particles(particle_data_t& ptc, rng_states_t<exec_tags::device>& rng_states,
                  buffer<float>& surface_n, int num_per_cell,
                  typename Conf::value_t weight,
-                 const grid_curv_t<Conf>& grid,
-                 typename Conf::value_t rpert1,
-                 typename Conf::value_t rpert2) {
+                 const grid_curv_t<Conf>& grid) {
   surface_n.assign_dev(0.0f);
 
   auto ptc_num = ptc.number();
   // First measure surface density
   ExecPolicy<Conf>::launch(
-      [ptc_num, rpert1, rpert2] LAMBDA(auto ptc, auto surface_n) {
+      [ptc_num] LAMBDA(auto ptc, auto surface_n) {
         auto& grid = dev_grid<Conf::dim, typename Conf::value_t>();
         auto ext = grid.extent();
         for (auto n : grid_stride_range(0, ptc_num)) {
@@ -86,8 +90,10 @@ void inject_particles(particle_data_t& ptc, rng_states_t<exec_tags::device>& rng
       ptc.get_dev_ptrs(), surface_n.dev_ptr());
   ExecPolicy<Conf>::sync();
 
-  Scalar th1 = math::acos(math::sqrt(1.0f - 1.0f / rpert1));
-  Scalar th2 = math::acos(math::sqrt(1.0f - 1.0f / rpert2));
+  //Scalar th1 = math::acos(math::sqrt(1.0f - 1.0f / rpert1));
+  Scalar th1 = m_twist_th1;
+  //Scalar th2 = math::acos(math::sqrt(1.0f - 1.0f / rpert2));
+  Scalar th2 = m_twist_th2;
   if (th1 > th2)
     swap_values(th1, th2);
 
@@ -140,6 +146,8 @@ void inject_particles(particle_data_t& ptc, rng_states_t<exec_tags::device>& rng
     sim_env().get_data("E0", E0);
     sim_env().get_data("Bdelta", B);
     sim_env().get_data("B0", B0);
+    sim_env().get_data("rand_states", rand_states);
+    sim_env().get_data("particles", ptc);
 
 
     sim_env().params().get_value("w0", m_w0);
@@ -209,11 +217,9 @@ void inject_particles(particle_data_t& ptc, rng_states_t<exec_tags::device>& rng
           },
           E, B, E0, B0);
       ExecPolicy<Conf>::sync();
-    //if we are still actively injecting the wave, inject particles
+    //if we are still actively injecting the wave, inject 1 particle per cell
     if (phase < 2.0 * M_PI * m_num_lambda && step%1==0){
-          inject_particles(*ptc, *rand_states, m_surface_ne, m_surface_np, 1,
-                                  0.2, m_grid, wpert, 1);
-        
+          inject_particles(*ptc, *rand_states, m_surface_n, 1, 0.2, m_grid);
     }
     }
   }

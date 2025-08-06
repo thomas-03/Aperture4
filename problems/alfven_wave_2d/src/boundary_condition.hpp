@@ -47,7 +47,7 @@ class boundary_condition : public system_t {
   nonown_ptr<vector_field<Conf>> E, B, E0, B0;
 
   particle_data_t *ptc;
-  curand_states_t *rand_states;
+  rng_states_t *rng_states;
 
   buffer<float> m_surface_n;
 
@@ -146,7 +146,7 @@ void inject_particles(particle_data_t& ptc, rng_states_t<exec_tags::device>& rng
     sim_env().get_data("E0", E0);
     sim_env().get_data("Bdelta", B);
     sim_env().get_data("B0", B0);
-    sim_env().get_data("rand_states", rand_states);
+    sim_env().get_data("rng_states", rng_states);
     sim_env().get_data("particles", ptc);
 
 
@@ -219,7 +219,7 @@ void inject_particles(particle_data_t& ptc, rng_states_t<exec_tags::device>& rng
       ExecPolicy<Conf>::sync();
     //if we are still actively injecting the wave, inject 1 particle per cell
     if (phase < 2.0 * M_PI * m_num_lambda && step%1==0){
-          inject_particles(*ptc, *rand_states, m_surface_n, 1, 0.2, m_grid);
+          inject_particles(*ptc, *rng_states, m_surface_n, 1, 0.2, m_grid);
     }
     }
   }

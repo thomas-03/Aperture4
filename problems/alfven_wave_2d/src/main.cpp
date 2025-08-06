@@ -45,6 +45,8 @@ main(int argc, char *argv[]) {
 
   domain_comm<Conf, exec_policy_dynamic> comm;
   grid_sph_t<Conf> grid(comm);
+
+  env.register_data<particle_data_t>("particles", max_ptc_num, MemType::device_managed);
   auto pusher =
       env.register_system<ptc_updater<Conf, exec_policy_dynamic,
                                       coord_policy_spherical_gca>>(
@@ -109,9 +111,9 @@ main(int argc, char *argv[]) {
 
   
   particle_data_t *ptc;
-  curand_states_t *states;
+  rng_states_t *states;
 
-  env.get_data("rand_states", &states);
+  env.get_data("rng_states", &states);
   env.get_data("particles", &ptc);
 
   env.run();

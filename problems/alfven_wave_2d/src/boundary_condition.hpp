@@ -107,13 +107,11 @@ class boundary_condition : public system_t {
           if (theta > th2 + 0.1f || theta < th1 - 0.1f)
             continue;
 
-          // if (surface_n[pos[1]] >
-          //     square(0.5f / grid.delta[1]) * math::sin(theta))
-          //   continue;
+          // for each cell on the surface within the theta range, inject num_inj pairs of particles
           for (int i = 0; i < num_inj; i++) {
-            auto x2 = rng.uniform<value_t>(state);
+            auto x2 = rng.uniform<Conf::value_t>(states);
             theta = grid.template coord<1>(n1, x2);
-            auto p = 0.1 * rng.uniform<value_t>(state);
+            auto p = 0.1 * rng.uniform<Conf::value_t>(states);
             ptc.x1[offset + i * 2] = ptc.x1[offset + i * 2 + 1] = 0.5f;
             ptc.x2[offset + i * 2] = ptc.x2[offset + i * 2 + 1] = x2;
             ptc.x3[offset + i * 2] = ptc.x3[offset + i * 2 + 1] = 0.0f;
